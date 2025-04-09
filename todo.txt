@@ -1,0 +1,14 @@
+﻿
+// Ilk başta normal yap sonra yavaş yavaş mikro servis haline git rve treasy'de ki toolların hepsni burada dene.
+
+EntityFramewwork configuration zone will be by its file.
+
+UnitOfWork ile transaction yapısı kur.
+
+Treasy'de ki toolları burada kullan.
+
+BU yapıyı mikroservis haline getir.
+
+gateway kur. (Cursor ile)
+
+Kafka kur,

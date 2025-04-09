@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace HangfireTaskAutomator.Core.Services;
 
-namespace HangfireTaskAutomator.Core.Services
+public interface IReportService
 {
-    internal interface IReportService
-    {
-    }
+    Task GenerateDailyReportAsync();
+    Task GenerateWeeklyReportAsync();
+    Task GenerateMonthlyReportAsync();
+    Task ProcessPendingReportsAsync();
 }
