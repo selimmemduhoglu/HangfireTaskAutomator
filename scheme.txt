@@ -1,0 +1,53 @@
+﻿TaskAutomator/
+│
+├── TaskAutomator.sln                      # Solution dosyası
+│
+├── TaskAutomator.API/                     # API Projesi
+│   ├── Controllers/
+│   │   └── JobsController.cs              # İş kontrolcüsü
+│   ├── Program.cs                         # .NET 9.0 uygulaması başlangıç noktası
+│   ├── appsettings.json                   # Yapılandırma dosyası
+│   ├── appsettings.Development.json       # Geliştirme ortamı yapılandırmaları
+│   ├── Properties/
+│   │   └── launchSettings.json            # Uygulama başlatma ayarları
+│   └── TaskAutomator.API.csproj           # API proje dosyası
+│
+├── TaskAutomator.Core/                    # Çekirdek Kütüphane Projesi
+│   ├── Models/                            # Veritabanı modelleri
+│   │   ├── Email.cs                       # E-posta modeli
+│   │   ├── ReportData.cs                  # Rapor veri modeli
+│   │   └── TaskHistory.cs                 # Görev geçmişi modeli
+│   ├── Services/                          # Servis arayüzleri
+│   │   ├── IEmailService.cs               # E-posta servis arayüzü
+│   │   ├── IReportService.cs              # Rapor servis arayüzü
+│   │   ├── IDataCleanupService.cs         # Veri temizleme servis arayüzü
+│   │   └── IJobMonitorService.cs          # İş izleme servis arayüzü
+│   └── TaskAutomator.Core.csproj          # Çekirdek proje dosyası
+│
+└── TaskAutomator.Infrastructure/          # Altyapı Projesi
+    ├── Data/                              # Veritabanı erişim katmanı
+    │   └── ApplicationDbContext.cs        # Entity Framework DbContext sınıfı
+    ├── Services/                          # Servis implementasyonları
+    │   ├── EmailService.cs                # E-posta servis implementasyonu
+    │   ├── ReportService.cs               # Rapor servis implementasyonu
+    │   ├── DataCleanupService.cs          # Veri temizleme servis implementasyonu
+    │   └── JobMonitorService.cs           # İş izleme servis implementasyonu
+    ├── Jobs/                              # Hangfire iş sınıfları
+    │   └── HangfireJobs.cs                # Tüm Hangfire işlerini içeren sınıf
+    ├── Configuration/                     # Yapılandırma sınıfları
+    │   └── HangfireConfiguration.cs       # Hangfire yapılandırması
+    └── TaskAutomator.Infrastructure.csproj # Altyapı proje dosyası
+
+# Veritabanı
+└── SQL Server
+    ├── TaskAutomator                      # Veritabanı
+    │   ├── Emails                         # E-posta tablosu
+    │   ├── ReportData                     # Rapor verisi tablosu
+    │   ├── TaskHistory                    # Görev geçmişi tablosu
+    │   └── Hangfire Tabloları             # Hangfire'ın kendi tabloları
+    │       ├── HangfireCounter
+    │       ├── HangfireHash
+    │       ├── HangfireJobs
+    │       ├── HangfireList
+    │       ├── HangfireSet
+    │       └── HangfireState
