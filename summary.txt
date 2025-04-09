@@ -1,0 +1,183 @@
+﻿.NET 9.0 Hangfire Projesi Özeti
+Proje Yapısı
+Proje, Clean Architecture prensipleri doğrultusunda üç ana katmandan oluşuyor:
+
+TaskAutomator.API: Web API ve kullanıcı arayüzünü içerir
+TaskAutomator.Core: İş mantığı ve model sınıflarını içerir
+TaskAutomator.Infrastructure: Veritabanı erişimi ve harici hizmet entegrasyonlarını içerir
+
+Veritabanı ve Model Yapısı
+Proje SQL Server veritabanı kullanır ve şu tabloları içerir:
+
+Emails: E-posta gönderim kayıtlarını tutar
+ReportData: Oluşturulan rapor bilgilerini tutar
+TaskHistory: Çalıştırılan görevlerin geçmişini ve durumlarını tutar
+
+Hangfire Özellikleri
+Projede kullanılan Hangfire özellikleri:
+
+İş Türleri:
+
+Fire-and-forget: Anında çalıştırılan ve sonrasında unutulan işler (e-posta gönderimi gibi)
+Delayed: Belirli bir gecikmeden sonra çalıştırılan işler (gecikmeli bildirimler)
+Recurring: Belirli bir zamanlamaya göre tekrarlayan işler (günlük raporlar, haftalık bakım)
+Continuation: Bir iş tamamlandığında başlatılan zincirleme işler
+
+
+Kuyruk Yönetimi:
+
+Farklı öncelik seviyelerine göre kuyruklar: default, emails, reports, maintenance
+Her kuyruk için özelleştirilmiş işçi (worker) sayıları
+
+
+Hata Yönetimi:
+
+Otomatik yeniden deneme mekanizması (AutomaticRetry)
+Başarısız işlerin izlenmesi ve kaydedilmesi
+
+
+Görev İzleme:
+
+Her görevin başlangıç, bitiş ve durum bilgilerinin kaydedilmesi
+Görev çalışma sürelerinin takibi
+
+
+Dashboard:
+
+Özelleştirilmiş Hangfire Dashboard ile görevlerin izlenmesi
+İş durumlarının ve geçmişinin görüntülenmesi
+
+
+Performans Optimizasyonları:
+
+Eşzamanlı çalışan işlerin sınırlandırılması
+Uzun süren işler için zaman aşımı yapılandırması
+
+
+
+Teknik Özellikler
+
+Bağımlılık Enjeksiyonu:
+
+Servis kayıtları ve bağımlılıkların yönetimi
+Interface kullanımı ile gevşek bağlı mimari
+
+
+Loglama:
+
+Serilog ile kapsamlı loglama
+Farklı log hedeflerine yazma (konsol, dosya)
+
+
+API Endpoints:
+
+RESTful API ile görev yönetimi
+Swagger/OpenAPI dokümantasyonu
+
+
+Veritabanı İşlemleri:
+
+Entity Framework Core ile veritabanı erişimi
+Code-first yaklaşımıyla veritabanı şeması oluşturma
+
+
+
+Görev Türleri
+Projede birçok farklı görev türü bulunuyor:
+
+E-posta İşleri:
+
+Tek e-posta gönderme
+Bekleyen e-postaları topluca gönderme
+Gecikmeli e-posta gönderme
+
+
+Rapor İşleri:
+
+Günlük rapor oluşturma (her gün sabah 7'de)
+Haftalık rapor oluşturma (her Pazartesi sabah 6'da)
+Aylık rapor oluşturma (her ayın 1'i sabah 5'te)
+
+
+Bakım İşleri:
+
+Eski verileri temizleme (her Pazar gece 2'de)
+Verileri arşivleme (her Pazar gece 3'te)
+
+
+Zincirleme İşler:
+
+E-posta oluştur -> E-postaları gönder -> İşlem tamamlandı bildirimi
+
+
+
+Hangfire Yapılandırması
+Bu projede Hangfire'ın önemli yapılandırma seçenekleri:
+
+
+
+services.AddHangfire(config => config
+    .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+    .UseSimpleAssemblyNameTypeSerializer()
+    .UseRecommendedSerializerSettings()
+    .UseSqlServerStorage(connectionString, new SqlServerStorageOptions
+    {
+        CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
+        SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
+        QueuePollInterval = TimeSpan.FromSeconds(15),
+        UseRecommendedIsolationLevel = true,
+        DisableGlobalLocks = true
+    })
+    .WithJobExpirationTimeout(TimeSpan.FromDays(7))
+    .UseFilter(new AutomaticRetryAttribute { Attempts = 3 })
+);
+
+
+
+
+
+İşletim Ortamını Hazırlama
+Projeyi çalıştırmak için:
+
+SQL Server veritabanını oluşturun
+Connection string'i appsettings.json dosyasında yapılandırın
+Migrationları çalıştırın: dotnet ef database update
+Projeyi başlatın: dotnet run
+Hangfire Dashboard'a erişin: https://localhost:5001/hangfire
+
+Kullanım Örnekleri
+
+
+
+E-posta Gönderme:
+
+POST /api/jobs/send-email
+{
+  "recipient": "user@example.com",
+  "subject": "Merhaba",
+  "body": "Bu bir test e-postasıdır"
+}
+
+
+
+Rapor Oluşturma:
+
+POST /api/jobs/generate-report
+{
+  "reportType": "daily"
+}
+
+
+
+İş Zinciri Oluşturma:
+
+POST /api/jobs/job-chain
+{
+  "recipient": "admin@example.com",
+  "subject": "Zincirleme İş",
+  "body": "Bu bir iş zinciri testidir"
+}
+
+
+Bu proje, .NET 9.0 ve Hangfire'ın birçok özelliğini kullanarak kapsamlı bir arkaplan iş yönetimi sistemi oluşturur. İhtiyacınıza göre düzenlenerek gerçek projelerde kullanılabilir.
+Başka bir sorunuz veya eklemek istediğiniz bir özellik var mı?

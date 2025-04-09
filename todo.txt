@@ -12,3 +12,9 @@ BU yapıyı mikroservis haline getir.
 gateway kur. (Cursor ile)
 
 Kafka kur,
+
+
+
+
+
+SendDelayedEmail methdounun asycn olmaması problem mi?

@@ -1,15 +1,39 @@
+﻿using HangfireTaskAutomator.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
+using Serilog;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Serilog yapılandırması
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .Enrich.FromLogContext()
+    .WriteTo.Console()
+    .WriteTo.File("logs/taskautomator-.log", rollingInterval: RollingInterval.Day)
+    .CreateLogger();
 
+builder.Host.UseSerilog();
+
+// Veritabanı bağlantısı
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        opt => opt.EnableRetryOnFailure(3)
+    ));
+
+// Controller'ları ekle
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+// Hangfire servislerini ekle
+builder.Services.AddHangfireServices(builder.Configuration);
+
+// Swagger/OpenAPI yapılandırması
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// HTTP request pipeline yapılandırması
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -17,9 +41,22 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
 
+// Hangfire Dashboard'ı yapılandır
+app.UseHangfireDashboard(builder.Configuration);
+
+// Veritabanı geçişleri
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    dbContext.Database.Migrate();
+}
+
+// Tekrarlayan işleri planla
+HangfireConfiguration.ScheduleRecurringJobs();
+
+// Controller'ları yapılandır
 app.MapControllers();
 
 app.Run();
